@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/go-challenge/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -35,47 +36,45 @@ func ConnectMongoDB() (*MongoDB, error) {
 		MongoClient: client,
 	}, nil
 }
-
-func (db *MongoDB) FetchDataFromMongoDB() {
+func (db *MongoDB) FetchDataFromMongoDB(startDate string, endDate string, minCount int, maxCount int) ([]models.FetchRecordsArrayModel, string, int) {
 
 	database := db.MongoClient.Database("getir-case-study")
 	recordsCollection := database.Collection("records")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Second)
 	defer cancel()
-	fmt.Println("111")
-
-	//var dataFromMongoDB []models.DataFromMongoDBModel
-
-	startDate := "2011-01-26"
-	endDate := "2022-02-02"
 	const (
 		layoutISO = "2006-01-02"
 	)
 
-	t2, _ := time.Parse(layoutISO, startDate)
+	startTime, _ := time.Parse(layoutISO, startDate)
 
-	t3, _ := time.Parse(layoutISO, endDate)
+	endTime, _ := time.Parse(layoutISO, endDate)
 
-	fmt.Println(primitive.NewDateTimeFromTime(t2))
+	matchStage := bson.D{{"$match", bson.D{primitive.E{Key: "createdAt", Value: bson.M{"$gt": startTime, "$lt": endTime}}}}}
+	groupStage := bson.D{{"$project", bson.D{primitive.E{Key: "key", Value: "$key"}, primitive.E{Key: "createdAt", Value: "$createdAt"}, {"totalCounts", bson.D{{"$sum", "$counts"}}}}}}
+	matchStage2 := bson.D{{"$match", bson.D{primitive.E{Key: "totalCounts", Value: bson.M{"$gt": minCount, "$lt": maxCount}}}}}
 
-	fmt.Println(primitive.NewDateTimeFromTime(t3))
-
-	matchStage := bson.D{{"$match", bson.D{primitive.E{Key: "key", Value: "TAKwGc6Jr4i8Z487"}, primitive.E{Key: "createdAt", Value: bson.M{"$gt": t2, "$lt": t3}}}}}
-	groupStage := bson.D{{"$project", bson.D{{"key", "$key"}, {"createdAt", "$createdAt"}, {"totalCounts", bson.D{{"$sum", "$counts"}}}}}}
-
-	cursor, err := recordsCollection.Aggregate(ctx, mongo.Pipeline{matchStage, groupStage})
+	cursor, err := recordsCollection.Aggregate(ctx, mongo.Pipeline{matchStage, groupStage, matchStage2})
 	if err != nil {
-		fmt.Println("12121")
-		panic(err)
+		log.Println(err)
+		return nil, "pipeline did not work", 500
 	}
-	result := []bson.M{}
 
+	result := []models.DataFromMongoDBModel{}
 	if err = cursor.All(ctx, &result); err != nil {
-		fmt.Println("333")
-		panic(err)
+		log.Println(err)
+		return nil, "cursor has crushed", 500
 	}
+
 	fmt.Println(result)
+
+	response := make([]models.FetchRecordsArrayModel, len(result))
+	for index, item := range result {
+		response[index] = models.FetchRecordsArrayModel{item.Key, item.CreatedAt.Time().Format(time.RFC3339Nano), item.TotalCounts}
+	}
+
+	return response, "Success", 0
 
 }
 

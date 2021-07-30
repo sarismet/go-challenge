@@ -43,17 +43,24 @@ func Init() {
 }
 
 func (app *App) fetchData(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Welcome to the fetchData!")
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%s", body)
+	fmt.Printf("%s\n", body)
 	fetchRequestModel := models.FetchRequestModel{}
 	json.Unmarshal([]byte(body), &fetchRequestModel)
-	fmt.Printf("StartDate : %s", fetchRequestModel.StartDate)
 
-	app.MongoDB.FetchDataFromMongoDB()
+	records, msg, resulstCode := app.MongoDB.FetchDataFromMongoDB(fetchRequestModel.StartDate, fetchRequestModel.EndDate, fetchRequestModel.MinCount, fetchRequestModel.MaxCount)
+
+	json, err := json.Marshal(models.FetchResponseModel{Code: resulstCode, Msg: msg, Records: records})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(json)
 }
 
 func (app *App) postKey(w http.ResponseWriter, r *http.Request) {

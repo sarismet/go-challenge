@@ -9,9 +9,20 @@ type FetchRequestModel struct {
 	MaxCount  int    `json:"maxCount" bson:"maxCount"`
 }
 
+type FetchResponseModel struct {
+	Code    int                      `json:"code" bson:"code"`
+	Msg     string                   `json:"msg" bson:"msg"`
+	Records []FetchRecordsArrayModel `json:"records" bson:"records"`
+}
+
+type FetchRecordsArrayModel struct {
+	Key         string `json:"key" bson:"key"`
+	CreatedAt   string `json:"createdAt" bson:"createdAt"`
+	TotalCounts int    `json:"totalCounts" bson:"totalCounts"`
+}
+
 type DataFromMongoDBModel struct {
-	Key       string             `json:"key" bson:"key"`
-	CreatedAt primitive.DateTime `json:"createdAt" bson:"createdAt"`
-	Counts    []int              `json:"counts" bson:"counts"`
-	Value     string             `json:"value" bson:"value"`
+	Key         string             `json:"key" bson:"key"`
+	CreatedAt   primitive.DateTime `json:"createdAt" bson:"createdAt"`
+	TotalCounts int                `json:"totalCounts" bson:"totalCounts"`
 }
