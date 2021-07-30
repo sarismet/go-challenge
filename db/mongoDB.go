@@ -61,10 +61,14 @@ func (db *MongoDB) FetchDataFromMongoDB() {
 
 	fmt.Println(primitive.NewDateTimeFromTime(t3))
 
-	matchStage := bson.D{{"$match", bson.D{{"key", "TAKwGc6Jr4i8Z487"}}}}
-	groupStage := bson.D{{"$project", bson.D{{"total", bson.D{{"$sum", "$counts"}}}}}}
+	matchStage := bson.D{{"$match", bson.D{primitive.E{Key: "key", Value: "TAKwGc6Jr4i8Z487"}, primitive.E{Key: "createdAt", Value: bson.M{"$gt": t2, "$lt": t3}}}}}
+	groupStage := bson.D{{"$project", bson.D{{"key", "$key"}, {"createdAt", "$createdAt"}, {"totalCounts", bson.D{{"$sum", "$counts"}}}}}}
 
 	cursor, err := recordsCollection.Aggregate(ctx, mongo.Pipeline{matchStage, groupStage})
+	if err != nil {
+		fmt.Println("12121")
+		panic(err)
+	}
 	result := []bson.M{}
 
 	if err = cursor.All(ctx, &result); err != nil {
