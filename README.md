@@ -116,7 +116,6 @@ Response
 
 Request  
 
-```
 ```http
   POST http://localhost:5000/in-memory or http://18.118.255.222:5000/in-memory
 ```
@@ -149,7 +148,6 @@ Response
 
 Request  
 
-```
 ```http
   GET http://localhost:5000/in-memory?key=key1 or http://18.118.255.222:5000/in-memory?key=key1
 ```
