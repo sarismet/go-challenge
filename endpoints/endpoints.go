@@ -61,29 +61,32 @@ func (app *App) In_memory(w http.ResponseWriter, r *http.Request) {
 		if errCode == 404 {
 			json, err := json.Marshal(models.ErrorModel{"Not Found", errCode})
 			if err != nil {
-				http.Error(w, string(json), http.StatusInternalServerError)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
-			http.Error(w, string(json), errCode)
+			w.WriteHeader(errCode)
+			w.Write(json)
 			return
 		} else if errCode == 500 {
 			json, err := json.Marshal(models.ErrorModel{"Internal Server Error", errCode})
 			if err != nil {
-				http.Error(w, string(json), http.StatusInternalServerError)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
-			http.Error(w, string(json), errCode)
+			w.WriteHeader(errCode)
+			w.Write(json)
 			return
+		} else {
+			getResponseModel := models.GetResponseModel{}
+			getResponseModel.Key = key
+			getResponseModel.Value = string(res)
+			json, err := json.Marshal(getResponseModel)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			w.Write(json)
 		}
-		getResponseModel := models.GetResponseModel{}
-		getResponseModel.Key = key
-		getResponseModel.Value = string(res)
-		json, err := json.Marshal(getResponseModel)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		w.Write(json)
 	} else if r.Method == http.MethodPost {
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {

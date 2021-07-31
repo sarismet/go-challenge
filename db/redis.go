@@ -35,7 +35,7 @@ func (db *RedisDatabase) InsertKeyToRedis(key string, value string) string {
 
 func (db *RedisDatabase) GetKeyFromRedis(key string) ([]byte, int) {
 	val, err := db.Client.Get(Ctx, key).Result()
-	if val == "" || err.Error() == "redis: nil" {
+	if val == "" || (err != nil && err.Error() == "redis: nil") {
 		return nil, 404
 	} else if err != nil {
 		return nil, 500
