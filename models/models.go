@@ -40,3 +40,8 @@ type GetResponseModel struct {
 	Key   string `json:"key" bson:"key"`
 	Value string `json:"value" bson:"value"`
 }
+
+type ErrorModel struct {
+	Msg  string `json:"msg" bson:"msg"`
+	Code int    `json:"code" bson:"code"`
+}

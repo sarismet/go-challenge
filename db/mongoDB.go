@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -65,8 +64,4 @@ func (db *MongoDB) FetchDataFromMongoDB(startDate string, endDate string, minCou
 		response[index] = models.FetchRecordsArrayModel{item.Key, item.CreatedAt.Time().Format(time.RFC3339Nano), item.TotalCounts}
 	}
 	return response, "Success", 0
-}
-
-func HelloMongo() {
-	fmt.Println("Hello from Mongo")
 }

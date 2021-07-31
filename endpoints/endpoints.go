@@ -11,10 +11,6 @@ import (
 	"github.com/go-challenge/models"
 )
 
-func Hello() {
-	fmt.Println("Hello from endpoints")
-}
-
 type App struct {
 	RedisDB *db.RedisDatabase
 	MongoDB *db.MongoDB
@@ -60,14 +56,23 @@ func (app *App) FetchData(w http.ResponseWriter, r *http.Request) {
 func (app *App) In_memory(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method == http.MethodGet {
-		fmt.Println("GET params were:", r.URL.Query())
 		key := r.URL.Query().Get("key")
 		res, errCode := app.RedisDB.GetKeyFromRedis(key)
 		if errCode == 404 {
-			http.Error(w, "Not Found", errCode)
+			json, err := json.Marshal(models.ErrorModel{"Not Found", errCode})
+			if err != nil {
+				http.Error(w, string(json), http.StatusInternalServerError)
+				return
+			}
+			http.Error(w, string(json), errCode)
 			return
 		} else if errCode == 500 {
-			http.Error(w, "Internal Server Error", errCode)
+			json, err := json.Marshal(models.ErrorModel{"Internal Server Error", errCode})
+			if err != nil {
+				http.Error(w, string(json), http.StatusInternalServerError)
+				return
+			}
+			http.Error(w, string(json), errCode)
 			return
 		}
 		getResponseModel := models.GetResponseModel{}
@@ -84,7 +89,6 @@ func (app *App) In_memory(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Printf("%s\n", body)
 		postRequestModel := models.PostRequestModel{}
 		json.Unmarshal([]byte(body), &postRequestModel)
 		response := app.RedisDB.InsertKeyToRedis(postRequestModel.Key, postRequestModel.Value)

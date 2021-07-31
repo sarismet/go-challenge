@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	"github.com/go-redis/redis"
@@ -23,7 +22,6 @@ func NewRedisDatabase() (*RedisDatabase, error) {
 		DB:       0,
 	})
 	if err := client.Ping(Ctx).Err(); err != nil {
-		fmt.Println("err ", err)
 		return nil, err
 	}
 	return &RedisDatabase{
@@ -36,16 +34,11 @@ func (db *RedisDatabase) InsertKeyToRedis(key string, value string) string {
 }
 
 func (db *RedisDatabase) GetKeyFromRedis(key string) ([]byte, int) {
-	fmt.Println("Hello from Redis")
 	val, err := db.Client.Get(Ctx, key).Result()
-	if err != nil {
-		return nil, 500
-	} else if val == "" {
+	if val == "" || err.Error() == "redis: nil" {
 		return nil, 404
+	} else if err != nil {
+		return nil, 500
 	}
 	return []byte(val), 0
-}
-
-func HelloRedis() {
-	fmt.Println("Hello from Redis")
 }
