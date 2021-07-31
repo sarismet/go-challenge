@@ -26,3 +26,17 @@ type DataFromMongoDBModel struct {
 	CreatedAt   primitive.DateTime `json:"createdAt" bson:"createdAt"`
 	TotalCounts int                `json:"totalCounts" bson:"totalCounts"`
 }
+
+type PostRequestModel struct {
+	Key   string `json:"key" bson:"key"`
+	Value string `json:"value" bson:"value"`
+}
+
+type PostResponseModel struct {
+	Value string `json:"value" bson:"value"`
+}
+
+type GetResponseModel struct {
+	Key   string `json:"key" bson:"key"`
+	Value string `json:"value" bson:"value"`
+}

@@ -30,43 +30,73 @@ func Init() {
 
 	MongoDB, err := db.ConnectMongoDB()
 	if err != nil || MongoDB == nil {
-		log.Fatal("Error as conencting to Sql")
+		log.Fatal("Error as conencting to MongoDB")
 		return
 	}
 	app.RedisDB = RedisDB
 	app.MongoDB = MongoDB
-
-	http.HandleFunc("/fetchData", app.fetchData)
-	http.HandleFunc("/postKey", app.postKey)
-	http.HandleFunc("/getKey", app.getKey)
+	http.HandleFunc("/fetchData", app.FetchData)
+	http.HandleFunc("/in-memory", app.In_memory)
 	log.Fatal(http.ListenAndServe(":5000", nil))
 }
 
-func (app *App) fetchData(w http.ResponseWriter, r *http.Request) {
+func (app *App) FetchData(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%s\n", body)
 	fetchRequestModel := models.FetchRequestModel{}
 	json.Unmarshal([]byte(body), &fetchRequestModel)
-
 	records, msg, resulstCode := app.MongoDB.FetchDataFromMongoDB(fetchRequestModel.StartDate, fetchRequestModel.EndDate, fetchRequestModel.MinCount, fetchRequestModel.MaxCount)
-
 	json, err := json.Marshal(models.FetchResponseModel{Code: resulstCode, Msg: msg, Records: records})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(json)
 }
 
-func (app *App) postKey(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Welcome to the postKey!")
-}
-
-func (app *App) getKey(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Welcome to the getKey!")
+func (app *App) In_memory(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	if r.Method == http.MethodGet {
+		fmt.Println("GET params were:", r.URL.Query())
+		key := r.URL.Query().Get("key")
+		res, errCode := app.RedisDB.GetKeyFromRedis(key)
+		if errCode == 404 {
+			http.Error(w, "Not Found", errCode)
+			return
+		} else if errCode == 500 {
+			http.Error(w, "Internal Server Error", errCode)
+			return
+		}
+		getResponseModel := models.GetResponseModel{}
+		getResponseModel.Key = key
+		getResponseModel.Value = string(res)
+		json, err := json.Marshal(getResponseModel)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Write(json)
+	} else if r.Method == http.MethodPost {
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("%s\n", body)
+		postRequestModel := models.PostRequestModel{}
+		json.Unmarshal([]byte(body), &postRequestModel)
+		response := app.RedisDB.InsertKeyToRedis(postRequestModel.Key, postRequestModel.Value)
+		postResponseModel := models.PostResponseModel{}
+		postResponseModel.Value = response
+		json, err := json.Marshal(postResponseModel)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Write(json)
+	} else {
+		fmt.Fprintf(w, "Method is not allowed!")
+	}
 }
