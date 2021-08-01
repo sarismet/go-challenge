@@ -15,6 +15,7 @@ var (
 	Ctx = context.TODO()
 )
 
+//Creates a new redis client
 func NewRedisDatabase() (*RedisDatabase, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr:     os.Getenv("REDIS_URL"),
@@ -29,10 +30,12 @@ func NewRedisDatabase() (*RedisDatabase, error) {
 	}, nil
 }
 
+//Insert a key value pair to redis
 func (db *RedisDatabase) InsertKeyToRedis(key string, value string) string {
 	return db.Client.Set(Ctx, key, value, 0).Val()
 }
 
+//Gets the value using its key from redis
 func (db *RedisDatabase) GetKeyFromRedis(key string) ([]byte, int) {
 	val, err := db.Client.Get(Ctx, key).Result()
 	if val == "" || (err != nil && err.Error() == "redis: nil") {

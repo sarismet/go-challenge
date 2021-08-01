@@ -1,0 +1,148 @@
+{
+	"info": {
+		"_postman_id": "c5a90782-7732-4514-9c56-355339637bb0",
+		"name": "go-challenge-postman",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "fetchData-remote",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"startDate\": \"2016-11-22\",\r\n    \"endDate\": \"2016-12-05\",\r\n    \"minCount\": 100,\r\n    \"maxCount\": 150\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://18.118.255.222:5000/fetchData",
+					"protocol": "http",
+					"host": [
+						"18",
+						"118",
+						"255",
+						"222"
+					],
+					"port": "5000",
+					"path": [
+						"fetchData"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "In-Memory POST remote",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"key\": \"key1\",\r\n    \"value\": \"value1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://18.118.255.222:5000/in-memory",
+					"protocol": "http",
+					"host": [
+						"18",
+						"118",
+						"255",
+						"222"
+					],
+					"port": "5000",
+					"path": [
+						"in-memory"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "In-Memory GET remote",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://18.118.255.222:5000/in-memory?key=key1",
+					"protocol": "http",
+					"host": [
+						"18",
+						"118",
+						"255",
+						"222"
+					],
+					"port": "5000",
+					"path": [
+						"in-memory"
+					],
+					"query": [
+						{
+							"key": "key",
+							"value": "key1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "fetchData-locale",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": null
+			},
+			"response": []
+		},
+		{
+			"name": "In-Memory GET locale",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": null
+			},
+			"response": []
+		},
+		{
+			"name": "In-Memory POST locale",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"key\": \"key1\",\r\n    \"value\": \"value1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/in-memory",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"in-memory"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
