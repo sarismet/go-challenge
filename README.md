@@ -176,9 +176,10 @@ Response
 
 To run the endpoints one by one
 ```bash
+  docker ps (get the container id of go-challenge_app images)
+  docker exec -it [CONTAINER-ID] bash (by doing that we can access bash terminal of our container)
   cd tests
-  go test ./fetchData_test.go -v
-  go test ./in_memory_test.go -v
+  go test . -v
 ```
 
 
