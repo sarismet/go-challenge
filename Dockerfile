@@ -19,7 +19,8 @@ RUN apt-get upgrade -y
 ENV GOBIN /go/bin
 
 RUN go get github.com/go-redis/redis
-
+RUN go get github.com/alicebob/miniredis
+RUN go get github.com/stretchr/testify
 RUN go get go.mongodb.org/mongo-driver/mongo
 RUN go get go.mongodb.org/mongo-driver/bson
 
