@@ -2,7 +2,6 @@ package endpoints
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -54,7 +53,6 @@ func (app *App) FetchData(w http.ResponseWriter, r *http.Request) {
 	startTime, err := time.Parse(layoutISO, fetchRequestModel.StartDate)
 	//If we have an issue parsing the StartDate field then we return an error message to client here.
 	if err != nil {
-		fmt.Printf("StartDate is not a valid date")
 		json, err := json.Marshal(models.FetchResponseModel{Code: 404, Msg: "StartDate is not a valid date"})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -67,7 +65,6 @@ func (app *App) FetchData(w http.ResponseWriter, r *http.Request) {
 	//If we have an issue parsing the EndDate field then we return an error message to client here.
 	endTime, err := time.Parse(layoutISO, fetchRequestModel.EndDate)
 	if err != nil {
-		fmt.Printf("EndDate is not a valid date")
 		json, err := json.Marshal(models.FetchResponseModel{Code: 404, Msg: "EndDate is not a valid date"})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
