@@ -50,9 +50,9 @@ After that run these commands.
 ## Tech Stack
 
 **Database:** [Redis](https://redis.io/)
-```
+
 I needed to choose a In-Memory database and I decided to use Redis since I beleive that it is efficient and easy to use.
-```
+
 
 ## API Documentation
 
