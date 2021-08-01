@@ -35,17 +35,13 @@ func ConnectMongoDB() (*MongoDB, error) {
 		MongoClient: client,
 	}, nil
 }
-func (db *MongoDB) FetchDataFromMongoDB(startDate string, endDate string, minCount int, maxCount int) ([]models.FetchRecordsArrayModel, string, int) {
+func (db *MongoDB) FetchDataFromMongoDB(startTime time.Time, endTime time.Time, minCount int, maxCount int) ([]models.FetchRecordsArrayModel, string, int) {
 
 	database := db.MongoClient.Database("getir-case-study")
 	recordsCollection := database.Collection("records")
 	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Second)
 	defer cancel()
-	const (
-		layoutISO = "2006-01-02"
-	)
-	startTime, _ := time.Parse(layoutISO, startDate)
-	endTime, _ := time.Parse(layoutISO, endDate)
+
 	matchStage := bson.D{{"$match", bson.D{primitive.E{Key: "createdAt", Value: bson.M{"$gt": startTime, "$lt": endTime}}}}}
 	groupStage := bson.D{{"$project", bson.D{primitive.E{Key: "key", Value: "$key"}, primitive.E{Key: "createdAt", Value: "$createdAt"}, {"totalCounts", bson.D{{"$sum", "$counts"}}}}}}
 	matchStage2 := bson.D{{"$match", bson.D{primitive.E{Key: "totalCounts", Value: bson.M{"$gt": minCount, "$lt": maxCount}}}}}
