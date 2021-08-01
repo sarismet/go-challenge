@@ -169,6 +169,8 @@ Response
     "value": "value2"
 }
 ```
+## Note
+- I added a postman collection json file. You can just basicly import to your postman so that you can see how I had tried endpoints.
 
 ## Running Tests
 
